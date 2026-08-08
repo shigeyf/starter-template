@@ -1,0 +1,41 @@
+{
+  "name": "Project Default Dev Container",
+
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+
+  "privileged": true,
+
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "os-provided"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:4": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      // "extensions" for this project are specified in here will be installed in Dev Container.
+      "extensions": [
+        "DavidAnson.vscode-markdownlint",
+        "esbenp.prettier-vscode",
+        "GitHub.vscode-github-actions",
+        "redhat.vscode-yaml",
+        "tamasfe.even-better-toml"
+      ],
+      // DevContainer automatically inherits the workspace settings.json.
+      "settings": {
+        "terminal.integrated.shellIntegration.enabled": true
+      }
+    }
+  },
+
+  "remoteUser": "vscode",
+  "postCreateCommand": "bash .devcontainer/scripts/post-create.sh",
+
+  "mounts": []
+}

@@ -94,7 +94,5 @@
   "postCreateCommand": "bash .devcontainer/scripts/post-create.sh",
 
   "remoteUser": "vscode",
-  "mounts": [
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.copilot,target=/home/vscode/.copilot,type=bind,consistency=cached"
-  ]
+  "mounts": []
 }

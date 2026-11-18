@@ -1,0 +1,5 @@
+# After editing, regenerate the lock file from the repository root:
+# uv pip compile --python-version 3.12 --generate-hashes -o .devcontainer/requirements-dev.txt .devcontainer/requirements-dev.in
+pre-commit==4.7.0
+GitPython==3.2.1
+gitdb==4.0.12

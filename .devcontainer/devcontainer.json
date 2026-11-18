@@ -1,41 +1,100 @@
 {
-  "name": "Project Default Dev Container",
-
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": ".."
-  },
+  "name": "Project Workspace",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12-bookworm",
 
   "privileged": true,
 
   "features": {
-    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true
+    },
     "ghcr.io/devcontainers/features/git:1": {
       "version": "os-provided"
     },
-    "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/devcontainers/features/docker-in-docker:4": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/terraform:1": {
+      "version": "1.9",
+      "tflint": "latest"
+    },
+    "ghcr.io/devcontainers/features/azure-cli:1": {
+      "version": "latest",
+      "extensions": "account"
+    },
+    "ghcr.io/azure/azure-dev/azd:latest": {
+      "version": "latest",
+      "extensions": "microsoft.foundry,azure.ai.content-understanding,azure.ai.dataset,azure.ai.evaluations,azure.ai.models"
+    },
+    "ghcr.io/devcontainers-extra/features/actionlint:1": {
+      "version": "1.7.12"
+    },
+    "ghcr.io/devcontainers-extra/features/shellcheck:1": {
+      "version": "0.11.0"
+    },
+    "ghcr.io/devcontainers-extra/features/act:1": {
+      "version": "0.2.92"
+    },
+    "ghcr.io/devcontainers-extra/features/uv:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers-extra/features/direnv:1": {
+      "version": "latest"
+    }
   },
 
   "customizations": {
     "vscode": {
       // "extensions" for this project are specified in here will be installed in Dev Container.
       "extensions": [
+        "bierner.markdown-mermaid",
+        "charliermarsh.ruff",
         "DavidAnson.vscode-markdownlint",
         "esbenp.prettier-vscode",
         "GitHub.vscode-github-actions",
+        "HashiCorp.HCL",
+        "hashicorp.terraform",
+        "humao.rest-client",
+        "ms-azuretools.vscode-azureresourcegroups",
+        "ms-azuretools.vscode-azureterraform",
+        "ms-azuretools.vscode-azure-github-copilot",
+        "ms-azuretools.vscode-azure-mcp-server",
+        "ms-azuretools.vscode-bicep",
+        "ms-python.python",
+        "ms-python.vscode-python-envs",
+        "ms-python.pylance",
+        "ms-toolsai.jupyter",
+        "ms-toolsai.jupyter-keymap",
+        "ms-toolsai.jupyter-renderers",
+        "ms-vscode.azurecli",
         "redhat.vscode-yaml",
-        "tamasfe.even-better-toml"
+        "tamasfe.even-better-toml",
+        "tfsec.tfsec",
+        // Terragrunt extensions
+        "caseycs.vscode-terragrunt-navigator",
+        "BahramJoharshamshiri.hcl-lsp"
       ],
       // DevContainer automatically inherits the workspace settings.json.
       "settings": {
+        "python-envs.terminal.autoActivationType": "command",
         "terminal.integrated.shellIntegration.enabled": true
       }
     }
   },
 
-  "remoteUser": "vscode",
   "postCreateCommand": "bash .devcontainer/scripts/post-create.sh",
 
-  "mounts": []
+  "remoteUser": "vscode",
+  "mounts": [
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.copilot,target=/home/vscode/.copilot,type=bind,consistency=cached"
+  ]
 }

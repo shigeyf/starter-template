@@ -1,7 +1,15 @@
 {
-  //"files.associations": {},
-  //"files.exclude": {},
-  //"search.exclude": {},
+  "files.associations": {
+    "terragrunt.hcl": "hcl",
+    "*.hcl": "hcl"
+  },
+  "files.exclude": {
+    "**/.terraform": true,
+    "**/.terraform.lock.hcl": false
+  },
+  "search.exclude": {
+    "**/.terraform": true
+  },
   "terminal.integrated.shellIntegration.enabled": true,
   // JSON
   "[json]": {
@@ -16,7 +24,8 @@
   // Markdown
   "[markdown]": {
     "editor.wordWrap": "off",
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint", // instead of "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
   },
   // TOML
   "[toml]": {
@@ -25,5 +34,31 @@
   // YAML
   "[yaml]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
-  }
+  },
+  // GitHub Actions YAML
+  "yaml.disableSchemaDetection": [
+    "**/.github/workflows/*.yml",
+    "**/.github/workflows/*.yaml",
+    "**/.gitea/workflows/*.yml",
+    "**/.gitea/workflows/*.yaml",
+    "**/.forgejo/workflows/*.yml",
+    "**/.forgejo/workflows/*.yaml"
+  ],
+  // Python
+  "python.useEnvironmentsExtension": true,
+  "python.analysis.extraPaths": ["./foundry-agent-deploy/scripts"],
+  // Python Ruff (Formatter & Linter)
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+  // REST Client
+  "rest-client.decodeEscapedUnicodeCharacters": true,
+  // Terraform
+  "terraform.languageServer.enable": true,
+  "terraform.validation.enableEnhancedValidation": true
 }

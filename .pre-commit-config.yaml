@@ -9,6 +9,10 @@ default_install_hook_types:
   - pre-commit
   - commit-msg
 
+# Pin Node.js LTS so nodeenv does not select an unsupported prerelease.
+default_language_version:
+  node: "24.22.3"
+
 repos:
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.3.0
@@ -21,33 +25,115 @@ repos:
     rev: v6.0.0
     hooks:
       - id: end-of-file-fixer
-        name: "[Fmt]  Fix end of files"
+        name: '[Fmt]  Fix end of files'
       - id: trailing-whitespace
-        name: "[Fmt]  Fix trailing whitespaces"
+        name: '[Fmt]  Fix trailing whitespaces'
 
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.47.0
     hooks:
-      - id: markdownlint
-        name: "[Lint] Markdownlint (*.md)"
-        args: ["--config", ".markdownlint.yaml"]
+    - id: markdownlint
+      name: '[Lint] Markdownlint (*.md)'
+      args: ["--config", ".markdownlint.yaml"]
+      exclude: '(^|/)agents/[^/]+/.*\.md$'
 
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v4.0.0-alpha.8
     hooks:
       - id: prettier
-        name: "[Fmt]  Prettier (*.json)"
+        name: '[Fmt]  Prettier (*.json)'
         types_or: [json]
+        exclude: '(^|/)results/eval_[^/]+/(raw/.*|reports/.*|comparisons/.*|context)\.json$'
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: check-yaml
-        name: "[Lint] check-yaml (*.yml,*.yaml)"
+        name: '[Lint] check-yaml (*.yml,*.yaml)'
         types_or: [yaml]
 
-  - repo: https://github.com/ComPWA/taplo-pre-commit
-    rev: v0.9.3
+  - repo: local
+    hooks:
+      - id: normalize-azure-yaml
+        name: '[Fmt]  Normalize azure.yaml'
+        # yq --inplace only updates the first input file.
+        entry: >-
+          bash -e -c
+          'expression=$1; shift; for file; do
+          yq eval --inplace --prettyPrint --indent 4 "$expression" "$file";
+          done' --
+        args:
+          # Preserve the schema annotation, which azd regenerates when saving.
+          - >-
+            ([... | head_comment | split("\n")[] |
+            select(test("^yaml-language-server: [$]schema=")) | . + "\n\n"] |
+            join("\n")) as $schema |
+            ... comments = "" |
+            sort_keys(..) |
+            . head_comment = $schema
+        language: golang
+        additional_dependencies:
+          - github.com/mikefarah/yq/v4@v4.48.1
+        files: '(^|/)azure\.yaml$'
+        stages: [pre-commit]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.9
+    hooks:
+      - id: ruff
+        name: '[Lint] Ruff (*.py)'
+        args: [--fix]
+      - id: ruff-format
+        name: '[Fmt]  Ruff format (*.py)'
+
+  #- repo: https://github.com/ComPWA/taplo-pre-commit
+  #  rev: v0.9.3
+  #  hooks:
+  #    - id: taplo-format
+  #      name: '[Fmt]  Taplo (*.toml)'
+  # Build with Rust: Taplo's PyPI package has no Linux ARM64 wheel.
+  - repo: local
     hooks:
       - id: taplo-format
         name: '[Fmt]  Taplo (*.toml)'
+        entry: taplo format
+        language: rust
+        additional_dependencies:
+          - cli:taplo-cli:0.9.3
+        types: [toml]
+
+  # actionlint accepts workflows, not standalone Action metadata files.
+  - repo: https://github.com/mpalmer/action-validator
+    rev: v0.9.0
+    hooks:
+      - id: action-validator
+        name: '[Lint] GitHub Action metadata'
+        files: '(^|/)action\.ya?ml$'
+        stages: [pre-commit]
+
+  - repo: local
+    hooks:
+      - id: actionlint
+        name: '[Lint] GitHub Actions workflows'
+        entry: actionlint
+        language: unsupported
+        files: ^\.github/workflows/.*\.ya?ml$
+        stages: [pre-commit]
+
+      - id: shellcheck
+        name: '[Lint] Shell scripts'
+        entry: shellcheck
+        language: unsupported
+        files: ^(scripts|\.github/scripts|\.devcontainer/scripts|foundry-[^/]*/scripts)/
+        types: [shell]
+        stages: [pre-commit]
+
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.99.5
+    hooks:
+      - id: terraform_fmt
+        name: '[Fmt]  Terraform fmt'
+      - id: terraform_validate
+        name: '[Lint] Terraform validate'
+      - id: terraform_tflint
+        name: '[Lint] Terraform tflint'
